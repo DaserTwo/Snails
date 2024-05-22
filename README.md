@@ -2,7 +2,7 @@
 A smol game that entire graphics is Voronoi diagram, and someone may find it looking like snails!
 
 ## Deps
-This game depends on RayLib[https://www.raylib.com/]
+This game depends on [RayLib](https://www.raylib.com/)
 
 ## Compilling
 1. Download and compile RayLib.
@@ -11,5 +11,5 @@ This game depends on RayLib[https://www.raylib.com/]
 4. Call make.
 5. Enjoy!
 
-####### Yes, I'm laizy lil s***.
+###### Yes, I'm laizy lil s***.
 
