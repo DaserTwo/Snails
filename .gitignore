@@ -3,3 +3,4 @@ include
 bin
 Snails
 *.dll
+*.exe

@@ -1,14 +1,11 @@
 #include <iostream>
 
 #include <cmath>
+#include <ctime>
 
 #include <raylib/raylib.h>
 
-#if defined(PLATFORM_DESKTOP)
-    #define GLSL_VERSION            330
-#else   // PLATFORM_ANDROID, PLATFORM_WEB
-    #define GLSL_VERSION            100
-#endif
+#define GLSL_VERSION            330
 
 inline float randf(int a = 1000, int b = 1000){
 	return float(rand() % a + 1) / b;
@@ -112,6 +109,8 @@ int score = 0;
 float jump_up = 0.f;
 float jump_down = 0.f;
 
+#define INITIAL_SPEED 0.1f
+
 int main(int argc, const char** argv){
 	srand(time(NULL));
 
@@ -130,7 +129,8 @@ int main(int argc, const char** argv){
 		targets[i]->pos.y = 0.5f;
 		targets[i]->pos.x = randf() * 3.f - 1.f;
 	}
-	
+	    
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 
 	InitWindow(800, 400, "Snails");
@@ -141,17 +141,23 @@ int main(int argc, const char** argv){
 	int colors_loc = GetShaderLocation(shader, "colors");
 	int positions_loc = GetShaderLocation(shader, "positions");
 
+	auto time = GetTime();
+	float speed = INITIAL_SPEED;
 	while(!WindowShouldClose()){
-		if(jump_up > 0.01f) jump_up -= 0.01f;
+		auto ntime = GetTime();
+		auto delta = ntime - time;
+		time = ntime;
+
+		if(jump_up > 0.01f) jump_up -= 0.8f * delta;
 		else jump_up = 0.f;
 
-		if(jump_down > 0.01f) jump_down -= 0.01f;
+		if(jump_down > 0.01f) jump_down -= 0.8f * delta;
 		else jump_down = 0.f;
 
 		player.pos.y = 0.5f + jumpPolynomial(jump_down) - jumpPolynomial(jump_up);
 
-		if(IsKeyDown(KEY_LEFT))    player.pos.x -= 0.002f;
-		if(IsKeyDown(KEY_RIGHT))   player.pos.x += 0.002f;
+		if(IsKeyDown(KEY_LEFT))    player.pos.x -= speed * delta;
+		if(IsKeyDown(KEY_RIGHT))   player.pos.x += speed * delta;
 		if(IsKeyPressed(KEY_UP))   jump_up = 1.f;
 		if(IsKeyPressed(KEY_DOWN)) jump_down = 1.f;
 		if(IsKeyPressed(KEY_D))    drawPoints = !drawPoints;
@@ -189,6 +195,8 @@ int main(int argc, const char** argv){
 				} else if(x < 0.5f){
 					targets[i]->pos.x = -randf();
 				}
+
+				speed = INITIAL_SPEED * log((score>0?score:0) + 3); // ln(3) is only a litle bit grather than 1
 			}
 
 			SetShaderValue(shader, colors_loc + i + 1, &targets[i]->col, SHADER_UNIFORM_VEC4);
